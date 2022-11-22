@@ -5,6 +5,7 @@ using static Microsoft.CodeAnalysis.CSharp.SyntaxFactory;
 using Core.Collectors;
 using System.Reflection.Metadata;
 using System.Xml.Linq;
+using System.Data.Common;
 
 namespace Core
 {
@@ -13,7 +14,7 @@ namespace Core
         private SyntaxList<UsingDirectiveSyntax> _usings = new SyntaxList<UsingDirectiveSyntax>()
                 .Add(UsingDirective(ParseName("System")))
                 .Add(UsingDirective(ParseName("System.Collections.Generic")))
-                .Add(UsingDirective(ParseName("System.Linq"))) 
+                .Add(UsingDirective(ParseName("System.Linq")))
                 .Add(UsingDirective(ParseName("System.Text")))
                 .Add(UsingDirective(ParseName("NUnit.Framework")));
         public List<TestClassInfo> Generate(string source)
@@ -26,7 +27,7 @@ namespace Core
             var testClasses = collector.Classes.Select(GenerateTestClass).ToList();
 
             return testClasses;
-                    
+
         }
 
         private TestClassInfo GenerateTestClass(ClassInfo classInfo)
@@ -41,7 +42,7 @@ namespace Core
             {
                 @namespace += ".Tests";
             }
-            
+
 
             return new TestClassInfo(classInfo.ClassDeclaration.Identifier.Text,
                 CompilationUnit()
@@ -65,7 +66,7 @@ namespace Core
                                             Token(SyntaxKind.PublicKeyword)))
                                     .WithMembers(new SyntaxList<MemberDeclarationSyntax>(GenerateTestMethods(classDeclaration)))))))
                     .NormalizeWhitespace().ToFullString());
-                        
+
 
         }
 
@@ -74,10 +75,11 @@ namespace Core
             var callClassName = classDeclaration.Identifier.Text;
             callClassName = "_" + Char.ToLowerInvariant(callClassName[0]) + callClassName.Substring(1);
 
-            var methods = classDeclaration.DescendantNodes()
+            var methods = classDeclaration.ChildNodes()
                 .OfType<MethodDeclarationSyntax>()
                 .Where(node => node.Modifiers.Any(SyntaxKind.PublicKeyword))
                 .ToList();
+
 
             methods.Sort((method1, method2) =>
                 string.Compare(method1.Identifier.Text, method2.Identifier.Text, StringComparison.Ordinal));
@@ -90,10 +92,11 @@ namespace Core
                 var body = new List<StatementSyntax>();
                 var args = new List<SyntaxNodeOrToken>();
                 foreach (var parameter in methods[i].ParameterList.Parameters)
-                {
+                {                    
                     args.Add(Argument(IdentifierName(parameter.Identifier.Text)));
                     args.Add(Token(SyntaxKind.CommaToken));
 
+                    // <ParameterType> <ParameterIdentifier> = default;
                     body.Add(LocalDeclarationStatement(
                                         VariableDeclaration(parameter.Type!)
                                         .WithVariables(
@@ -117,6 +120,7 @@ namespace Core
                     && typeSyntax.Keyword.ValueText == Token(SyntaxKind.VoidKeyword).ValueText)
                 {
                     // Generate act section for method that return void
+                    // _className.MethodName(args);
                     body.Add(ExpressionStatement(
                                 InvocationExpression(
                                     MemberAccessExpression(
@@ -126,6 +130,76 @@ namespace Core
                                 .WithArgumentList(
                                     ArgumentList(
                                         SeparatedList<ArgumentSyntax>(args)))));
+                }
+                else
+                {
+                    // Generate act section 
+                    // var actual = MethodName(args);
+                    body.Add(LocalDeclarationStatement(
+                                VariableDeclaration(
+                                    IdentifierName(
+                                        Identifier(
+                                            TriviaList(),
+                                            SyntaxKind.VarKeyword,
+                                            "var",
+                                            "var",
+                                            TriviaList())))
+                             .WithVariables(
+                                SingletonSeparatedList(
+                                    VariableDeclarator(
+                                        Identifier("actual"))
+                                    .WithInitializer(
+                                        EqualsValueClause(
+                                            InvocationExpression(
+                                                MemberAccessExpression(
+                                                    SyntaxKind.SimpleMemberAccessExpression,
+                                                    IdentifierName(callClassName),
+                                                    IdentifierName(methods[i].Identifier.Text)))
+                                            .WithArgumentList(
+                                                ArgumentList(
+                                                    SeparatedList<ArgumentSyntax>(args)))))))));
+
+                    // Generate assert section
+                    // <MethodReturnType> expected = default;
+                    body.Add(LocalDeclarationStatement(
+                                        VariableDeclaration(methods[i].ReturnType)
+                                        .WithVariables(
+                                            SingletonSeparatedList(
+                                                VariableDeclarator(
+                                                    Identifier("expected"))
+                                                .WithInitializer(
+                                                    EqualsValueClause(
+                                                        LiteralExpression(
+                                                            SyntaxKind.DefaultLiteralExpression,
+                                                            Token(SyntaxKind.DefaultKeyword))))))));
+
+                    // Assert.That(actual, Is.EqualTo(expected));
+                    body.Add(ExpressionStatement(
+                                InvocationExpression(
+                                    MemberAccessExpression(
+                                        SyntaxKind.SimpleMemberAccessExpression,
+                                        IdentifierName(
+                                            "Assert"),
+                                        IdentifierName("That")))
+                                .WithArgumentList(
+                                    ArgumentList(
+                                        SeparatedList<ArgumentSyntax>(
+                                            new SyntaxNodeOrToken[]{
+                                                Argument(
+                                                    IdentifierName("actual")),
+                                                Token(SyntaxKind.CommaToken),
+                                                Argument(
+                                                    InvocationExpression(
+                                                        MemberAccessExpression(
+                                                            SyntaxKind.SimpleMemberAccessExpression,
+                                                            IdentifierName("Is"),
+                                                            IdentifierName("EqualTo")))
+                                                    .WithArgumentList(
+                                                        ArgumentList(
+                                                            SingletonSeparatedList<ArgumentSyntax>(
+                                                                Argument(
+                                                                    IdentifierName("expected"))))))})))));
+
                 }
 
 
