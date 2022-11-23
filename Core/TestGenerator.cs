@@ -9,13 +9,6 @@ namespace Core
 {
     public class TestGenerator
     {
-        private SyntaxList<UsingDirectiveSyntax> _usings = new SyntaxList<UsingDirectiveSyntax>()
-                .Add(UsingDirective(ParseName("System")))
-                .Add(UsingDirective(ParseName("System.Collections.Generic")))
-                .Add(UsingDirective(ParseName("System.Linq")))
-                .Add(UsingDirective(ParseName("System.Text")))
-                .Add(UsingDirective(ParseName("NUnit.Framework")))
-                .Add(UsingDirective(ParseName("Moq")));
         public List<TestClassInfo> Generate(string source)
         {
             CompilationUnitSyntax root = CSharpSyntaxTree.ParseText(source).GetCompilationUnitRoot();
@@ -48,7 +41,9 @@ namespace Core
 
             return new TestClassInfo(classInfo.ClassDeclaration.Identifier.Text,
                 CompilationUnit()
-                    .WithUsings(new SyntaxList<UsingDirectiveSyntax>(_usings)
+                    .WithUsings(new SyntaxList<UsingDirectiveSyntax>(classInfo.Usings)
+                        .Add(UsingDirective(ParseName("NUnit.Framework")))
+                        .Add(UsingDirective(ParseName("Moq")))
                         .Add(UsingDirective(ParseName(classInfo.Namespace))))
                     .WithMembers(
                         SingletonList<MemberDeclarationSyntax>(
@@ -313,7 +308,7 @@ namespace Core
                     {
                         var fieldName = $"_{parameter.Identifier.Text.ToCamelCase()}";
 
-                        ctorArgs.Add(Argument(IdentifierName(fieldName)));
+                        ctorArgs.Add(Argument(IdentifierName($"{fieldName}.Object")));
 
                         fields.Add(FieldDeclaration(
                                         VariableDeclaration(

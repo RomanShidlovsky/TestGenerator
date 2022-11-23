@@ -12,28 +12,35 @@ namespace Core.Collectors
     public class ClassCollector : CSharpSyntaxWalker
     {
         public ICollection<ClassInfo> Classes { get; } = new HashSet<ClassInfo>();
-        public string FileScopeNamespace { get; private set; } = "";
+        private string _fileScopeNamespace = "";
+        private List<UsingDirectiveSyntax> _usings = new List<UsingDirectiveSyntax>();
+
+        public override void VisitUsingDirective(UsingDirectiveSyntax node)
+        {
+            _usings.Add(node);
+            base.VisitUsingDirective(node);
+        }
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
             var @namespace = "";
-            if (FileScopeNamespace != "")
+            if (_fileScopeNamespace != "")
             {
-                @namespace = FileScopeNamespace;
+                @namespace = _fileScopeNamespace;
             }
             else
             {
                 @namespace = GetClassNamespace(node);
             }
             
-            Classes.Add(new ClassInfo(node, @namespace, GetFullName(node)));
+            Classes.Add(new ClassInfo(node, @namespace, GetFullName(node), _usings));
            
             base.VisitClassDeclaration(node);
         }
 
         public override void VisitFileScopedNamespaceDeclaration(FileScopedNamespaceDeclarationSyntax node)
         {
-            FileScopeNamespace = node.Name.ToString(); 
+            _fileScopeNamespace = node.Name.ToString(); 
             
             base.VisitFileScopedNamespaceDeclaration(node);
         }

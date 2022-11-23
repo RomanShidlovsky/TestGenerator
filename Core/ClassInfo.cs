@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +13,14 @@ namespace Core
         public ClassDeclarationSyntax ClassDeclaration { get; }
         public string Namespace { get; }
         public string FullName { get; } 
+        public List<UsingDirectiveSyntax> Usings { get; }
 
-        public ClassInfo(ClassDeclarationSyntax classDeclaration, string @namespace, string fullName)
+        public ClassInfo(ClassDeclarationSyntax classDeclaration, string @namespace, string fullName, List<UsingDirectiveSyntax> usings)
         {
             ClassDeclaration = classDeclaration;
             Namespace = @namespace;
             FullName = fullName;
+            Usings = usings;
         }
     }
 }
