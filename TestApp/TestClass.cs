@@ -33,7 +33,10 @@ public class TestClass
 
         public int Stop(Object obj) { return 0; }
     }
+
+    public TestClass(IComparable comparable)
+    { }
 }
 
-public class R { }
+class R { }
 

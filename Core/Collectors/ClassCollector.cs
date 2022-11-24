@@ -1,11 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Core.Collectors
 {
@@ -23,18 +19,21 @@ namespace Core.Collectors
 
         public override void VisitClassDeclaration(ClassDeclarationSyntax node)
         {
-            var @namespace = "";
-            if (_fileScopeNamespace != "")
+            if (node.Modifiers.Any(SyntaxKind.PublicKeyword))
             {
-                @namespace = _fileScopeNamespace;
+                var @namespace = "";
+                if (_fileScopeNamespace != "")
+                {
+                    @namespace = _fileScopeNamespace;
+                }
+                else
+                {
+                    @namespace = GetClassNamespace(node);
+                }
+
+                Classes.Add(new ClassInfo(node, @namespace, GetFullName(node), _usings));
             }
-            else
-            {
-                @namespace = GetClassNamespace(node);
-            }
-            
-            Classes.Add(new ClassInfo(node, @namespace, GetFullName(node), _usings));
-           
+
             base.VisitClassDeclaration(node);
         }
 
@@ -58,12 +57,11 @@ namespace Core.Collectors
                 }
                 current = current.Parent;
             }
+
             if (builder.Length > 0)
             {
                 builder.Remove(builder.Length - 1, 1);
             }
-   
-
 
             return builder.ToString();
         }
