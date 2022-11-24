@@ -7,7 +7,7 @@ using Core.Extensions;
 
 namespace Core
 {
-    public class TestGenerator
+    public class TestsGenerator
     {
         public List<TestClassInfo> Generate(string source)
         {
@@ -39,7 +39,7 @@ namespace Core
             var setUp = GenerateSetUp(classInfo);
             
 
-            return new TestClassInfo(classInfo.ClassDeclaration.Identifier.Text,
+            return new TestClassInfo(classInfo.ClassDeclaration.Identifier.Text+"Tests",
                 CompilationUnit()
                     .WithUsings(new SyntaxList<UsingDirectiveSyntax>(classInfo.Usings)
                         .Add(UsingDirective(ParseName("NUnit.Framework")))

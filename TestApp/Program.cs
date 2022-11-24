@@ -5,7 +5,7 @@ internal class Program
 {
     private static void Main(string[] args)
     {
-        TestGenerator testGenerator = new TestGenerator();
+        TestsGenerator testGenerator = new TestsGenerator();
         string fileName = @"..\..\..\TestClass.cs";
         string path = @"..\..\..\..\..\out\";
         string text = File.ReadAllText(fileName);
