@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks.Dataflow;
 using Core;
 
-namespace TestGenerator
+namespace TestsGeneratorApp
 {
     public class Pipeline
     {

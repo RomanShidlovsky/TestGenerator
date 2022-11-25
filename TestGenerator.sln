@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core", "Core\Core.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Core.Tests", "Core.Tests\Core.Tests.csproj", "{113C95EC-C46C-4C95-9149-7DB51C1F0D4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestsGenerator", "TestGenerator\TestsGenerator.csproj", "{3ED894E1-EE41-4018-B9B6-CA756522F033}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestsGeneratorApp", "TestGeneratorApp\TestsGeneratorApp.csproj", "{A7692E61-F0FB-4508-8786-E50C710C6FDB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{113C95EC-C46C-4C95-9149-7DB51C1F0D4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{113C95EC-C46C-4C95-9149-7DB51C1F0D4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{113C95EC-C46C-4C95-9149-7DB51C1F0D4A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3ED894E1-EE41-4018-B9B6-CA756522F033}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3ED894E1-EE41-4018-B9B6-CA756522F033}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3ED894E1-EE41-4018-B9B6-CA756522F033}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3ED894E1-EE41-4018-B9B6-CA756522F033}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7692E61-F0FB-4508-8786-E50C710C6FDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7692E61-F0FB-4508-8786-E50C710C6FDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7692E61-F0FB-4508-8786-E50C710C6FDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7692E61-F0FB-4508-8786-E50C710C6FDB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
