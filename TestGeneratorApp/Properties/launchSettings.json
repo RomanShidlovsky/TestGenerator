@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "TestsGeneratorApp": {
+      "commandName": "Project",
+      "commandLineArgs": "Test1.cs|Test2.cs ../out 2 2 2",
+      "workingDirectory": "C:\\Users\\jager\\Desktop\\лабы\\mpp\\in"
+    }
+  }
+}

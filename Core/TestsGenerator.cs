@@ -36,7 +36,11 @@ namespace Core
             }
 
             var testMethods = GenerateTestMethods(classInfo);
-            var setUp = GenerateSetUp(classInfo);
+
+            
+            var setUp = classDeclaration.Modifiers.Any(SyntaxKind.StaticKeyword) 
+                ? new List<MemberDeclarationSyntax>() 
+                : GenerateSetUp(classInfo);
             
 
             return new TestClassInfo(classInfo.ClassDeclaration.Identifier.Text+"Tests",
